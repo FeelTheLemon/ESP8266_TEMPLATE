@@ -16,22 +16,31 @@
 	#define STAPSK  "password"
 #endif
 
-const char* ssid = STASSID;
-const char* password = STAPSK;
-
 char WiFiE::hostname[15];
+
+void configModeCallback (WiFiManager *myWiFiManager) {
+	Serial.println("Entered config mode");
+	Serial.println(WiFi.softAPIP());
+	//if you used auto generated SSID, print it
+	Serial.println(myWiFiManager->getConfigPortalSSID());
+}
 
 void WiFiE::init()
 {
 	sprintf(hostname, "esp8266-%06x", ESP.getChipId()); // you can override it
 
-	WiFi.mode(WIFI_STA);
-	WiFi.begin(ssid, password);
-	while (WiFi.waitForConnectResult() != WL_CONNECTED) {
-		//Serial.println("Connection Failed! Rebooting...");
+	WiFiManager wifiManager;
+	//reset settings - for testing
+	//wifiManager.resetSettings();
+
+	wifiManager.setAPCallback(configModeCallback);
+
+	if(!wifiManager.autoConnect(hostname)) {
+		Serial.println("failed to connect and hit timeout");
+		//reset and try again, or maybe put it to deep sleep
+		ESP.reset();
 		delay(1000);
-		ESP.restart();
-	}
+	} 
 	MDNS.begin(hostname);
 }
 
