@@ -11,10 +11,6 @@
 #include <ESP8266WebServer.h>
 #include "WiFiManager.h"          //https://github.com/tzapu/WiFiManager
 
-#ifndef STASSID
-	#define STASSID "SSID"
-	#define STAPSK  "password"
-#endif
 
 char WiFiE::hostname[15];
 
